@@ -128,7 +128,7 @@ void ADCSensor::set_sample_count(uint8_t sample_count) {
 #ifdef USE_ESP32
 float ADCSensor::sample()
 {
-  
+
   // https://github.com/espressif/esp-idf/blob/release/v5.2/components/hal/include/hal/adc_types.h
   //-------------ADC1 Init---------------//
   adc_oneshot_unit_handle_t adc1_handle;
@@ -138,7 +138,7 @@ float ADCSensor::sample()
       .ulp_mode = ADC_ULP_MODE_DISABLE,         // Sets if the ADC will be working under ULP mode.
   };
   ESP_ERROR_CHECK(adc_oneshot_new_unit(&init_config1, &adc1_handle));
-  
+
   //-------------ADC1 Config---------------//
   adc_oneshot_chan_cfg_t config = {
       .atten = ADC_ATTEN_DB_12,
@@ -146,21 +146,21 @@ float ADCSensor::sample()
   };
   ESP_ERROR_CHECK(adc_oneshot_config_channel(adc1_handle, ADC1_CHAN0, &config));
   //ESP_ERROR_CHECK(adc_oneshot_config_channel(adc1_handle, ADC1_CHAN1, &config));
-  
+
   //-------------ADC1 Calibration Init---------------//
   adc_cali_handle_t adc1_cali_chan0_handle = NULL;
   adc_cali_handle_t adc1_cali_chan1_handle = NULL;
   bool do_calibration1_chan0 = adc_calibration_init(ADC_UNIT_1, ADC1_CHAN0, ADC_ATTEN, &adc1_cali_chan0_handle);
   //bool do_calibration1_chan1 = adc_calibration_init(ADC_UNIT_1, ADC1_CHAN1, ADC_ATTEN, &adc1_cali_chan1_handle);
-  
+
   adc_oneshot_read(adc1_handle, ADC1_CHAN0, &adc_raw[0][0]);
-  ESP_LOGI(TAG, "ADC%d Channel[%d] Raw Data: %d", ADC_UNIT_1 + 1, ADC1_CHAN0, adc_raw[0][0]);
+  ESP_LOGI(TAG, "ADC%d Channel[%d] Raw Data: %d", ADC_UNIT_1 + 1, ADC1_CHAN1, adc_raw[0][1]);
   if (do_calibration1_chan0) {
       // Convert the ADC raw result into calibrated result
       ESP_ERROR_CHECK(adc_cali_raw_to_voltage(adc1_cali_chan0_handle, adc_raw[0][0], &voltage[0][0]));
-      ESP_LOGI(TAG, "ADC%d Channel[%d] Calibrated Voltage: %d mV", ADC_UNIT_1 + 1, ADC1_CHAN0, voltage[0][0]);
+      ESP_LOGI(TAG, "ADC%d Channel[%d] Calibrated Voltage: %d mV", ADC_UNIT_1 + 1, ADC1_CHAN1, voltage[0][1]);
   }
-  
+
   /*
   ESP_ERROR_CHECK(adc_oneshot_read(adc1_handle, ADC1_CHAN1, &adc_raw[0][1]));
   ESP_LOGI(TAG, "ADC%d Channel[%d] Raw Data: %d", ADC_UNIT_1 + 1, ADC1_CHAN1, adc_raw[0][1]);
@@ -180,8 +180,8 @@ float ADCSensor::sample()
       adc_calibration_deinit(adc1_cali_chan1_handle);
   }
   */
-    uint32_t mv_scaled = voltage[0][0]; // ADC1_CHAN0
-    //uint32_t mv_scaled = voltage[0][1]; // ADC1_CHAN1
+    // uint32_t mv_scaled = voltage[0][0]; // ADC1_CHAN0
+    uint32_t mv_scaled = voltage[0][1]; // ADC1_CHAN1
     float result = (float)(mv_scaled) / 1000;
     return result;
   }
