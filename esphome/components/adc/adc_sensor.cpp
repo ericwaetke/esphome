@@ -150,12 +150,11 @@ float ADCSensor::sample()
   //-------------ADC1 Calibration Init---------------//
   adc_cali_handle_t adc1_cali_chan0_handle = NULL;
   adc_cali_handle_t adc1_cali_chan1_handle = NULL;
-  bool do_calibration1_chan0 = adc_calibration_init(ADC_UNIT_1, ADC1_CHAN0, ADC_ATTEN, &adc1_cali_chan0_handle);
-  //bool do_calibration1_chan1 = adc_calibration_init(ADC_UNIT_1, ADC1_CHAN1, ADC_ATTEN, &adc1_cali_chan1_handle);
+  // bool do_calibration1_chan0 = adc_calibration_init(ADC_UNIT_1, ADC1_CHAN0, ADC_ATTEN, &adc1_cali_chan0_handle);
+  bool do_calibration1_chan1 = adc_calibration_init(ADC_UNIT_1, ADC1_CHAN1, ADC_ATTEN, &adc1_cali_chan1_handle);
 
-  adc_oneshot_read(adc1_handle, ADC1_CHAN0, &adc_raw[0][0]);
+  adc_oneshot_read(adc1_handle, ADC1_CHAN1, &adc_raw[0][1]);
   ESP_LOGI(TAG, "ADC%d Channel[%d] Raw Data: %d", ADC_UNIT_1 + 1, ADC1_CHAN1, adc_raw[0][1]);
-  ESP_LOGI(TAG, "Full adc_raw data: %d", adc_raw);
   if (do_calibration1_chan0) {
       // Convert the ADC raw result into calibrated result
       ESP_ERROR_CHECK(adc_cali_raw_to_voltage(adc1_cali_chan0_handle, adc_raw[0][0], &voltage[0][0]));
@@ -173,8 +172,8 @@ float ADCSensor::sample()
   */
   //Tear Down
   ESP_ERROR_CHECK(adc_oneshot_del_unit(adc1_handle));
-  if (do_calibration1_chan0) {
-      adc_calibration_deinit(adc1_cali_chan0_handle);
+  if (do_calibration1_chan1) {
+      adc_calibration_deinit(adc1_cali_chan1_handle);
   }
   /*
   if (do_calibration1_chan1) {
